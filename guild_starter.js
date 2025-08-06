@@ -34,15 +34,15 @@ appendReport("Lineup:", names.join(", "))
 
 // Task 2: Find a specific member
 let Arik = guildMembers.find(guildMember => guildMember.name === 'Arik')
-appendReport("Finding a specific person:", JSON.stringify(Arik, null, 2));
+appendReport("Finding a specific person:", Arik.name);
 
 // Task 3: Check for Online members
-online = guildMembers.filter(guildMember => guildMember.status === "online")
-appendReport("Online Members:", JSON.stringify(online, null, 2));
+online = guildMembers.filter(guildMember => guildMember.status === "online").map(guildMember => guildMember.name)
+appendReport("Online Members:", online.join(", "));
 
 // Task 4: Get a List of all Mages
-Mages = guildMembers.filter(guildMember => guildMember.class === "Mage")
-appendReport("Mages:", JSON.stringify(Mages, null, 2));
+Mages = guildMembers.filter(guildMember => guildMember.class === "Mage").map(guildMember => guildMember.name)
+appendReport("Mages:", Mages.join(", "));
 
 // Task 5: Upgrade Member Status
 raidStatus = {raidReady: true}
@@ -50,21 +50,29 @@ guildMemberStatus = guildMembers.map(guildMembers => ({
     ...guildMembers,
     ...raidStatus
 }))
-appendReport("Guild Member Status:", JSON.stringify(Mages, null, 2));
+appendReport("Guild Member Status:", JSON.stringify(guildMemberStatus, null, 2));
 
 // Task 6: Verify everyone is at max level
-maxLevel = guildMembers.every(guildMember => guildMember.level === '60')
-appendReport("Members at Max level:", JSON.stringify(maxLevel, null, 2))
+maxLevel = guildMembers.every(guildMember => guildMember.level === 60)
+appendReport("Is everyone at max level?", maxLevel)
 
 // Task 7: Calculate total guild XP
-let totalXP = []
-guildMembers.forEach(guildMember => {
-    totalXP.push(guildMember.exp)
-});
-totalXP.reduce(myFunc)
+let totalXP = guildMembers.reduce((total, guildMember) => {
+    return total + guildMember.exp;
+}, 0)
+appendReport("Total guild EXP:", totalXP)
 
-function myFunc(total, num) {
-  return total + num;
-}
+// Task 8: Count members by class:
+let membersByClass = guildMembers.reduce((counts, member) => {
+    counts[member.class] = (counts[member.class] || 0) + 1;
+    return counts;
+}, {});
+appendReport("Members by Class:", JSON.stringify(membersByClass, null, 2));
 
-console.log(totalXP)
+// Task 9: Combine Methods for an Elite List
+let topOnline60s = guildMembers
+  .filter(member => member.status === 'online' && member.level === 60)
+  .sort((a, b) => b.exp - a.exp) // sort descending by exp
+  .map(member => `${member.name} (Level ${member.level})`);
+
+appendReport("Online Level 60 Members (sorted by XP):", topOnline60s.join(", "));
